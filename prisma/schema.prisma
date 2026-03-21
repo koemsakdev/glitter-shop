@@ -1,0 +1,472 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ========== CORE BUSINESS ==========
+
+model Branch {
+  id BigInt @id @default(autoincrement())
+
+  // English
+  name_en    String
+  slug_en    String  @unique
+  address_en String?
+
+  // Khmer
+  name_km    String
+  slug_km    String  @unique
+  address_km String?
+
+  phone     String?
+  email     String?
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  warehouses Warehouse[]
+  products   Product[]
+  orders     Order[]
+  banners    Banner[]
+  pages      Page[]
+
+  @@index([status])
+}
+
+// ========== USER MANAGEMENT ==========
+
+model User {
+  id           BigInt   @id @default(autoincrement())
+  fullName     String
+  email        String   @unique
+  passwordHash String
+  phone        String?
+  avatarUrl    String?
+  status       String   @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  roles           UserRole[]
+  createdProducts Product[]  @relation("CreatedBy")
+  updatedProducts Product[]  @relation("UpdatedBy")
+
+  @@index([email])
+  @@index([status])
+}
+
+model Role {
+  id          BigInt  @id @default(autoincrement())
+  name        String  @unique // ADMIN, MANAGER, STAFF
+  description String?
+
+  users UserRole[]
+}
+
+model UserRole {
+  userId BigInt
+  roleId BigInt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+// ========== CATALOG MANAGEMENT ==========
+
+model Brand {
+  id BigInt @id @default(autoincrement())
+
+  // English
+  name_en String
+  slug_en String @unique
+
+  // Khmer
+  name_km String
+  slug_km String @unique
+
+  logo      String? // URL to brand logo
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+
+  products Product[]
+
+  @@index([status])
+}
+
+model Category {
+  id BigInt @id @default(autoincrement())
+
+  // English
+  name_en String
+  slug_en String @unique
+
+  // Khmer
+  name_km String
+  slug_km String @unique
+
+  image    String? // category image
+  parentId BigInt?
+  status   String  @default("ACTIVE")
+
+  createdAt DateTime @default(now())
+
+  parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryToCategory")
+
+  products Product[]
+
+  @@index([status])
+}
+
+// Color - with localized names
+model Color {
+  id BigInt @id @default(autoincrement())
+
+  // English
+  name_en String
+
+  // Khmer
+  name_km String
+
+  code   String? @unique
+  status String  @default("ACTIVE")
+
+  createdAt DateTime @default(now())
+
+  productVariants ProductVariant[]
+
+  @@unique([name_en, name_km])
+  @@index([status])
+}
+
+// Size - with localized names
+model Size {
+  id BigInt @id @default(autoincrement())
+
+  // English
+  name_en String
+
+  // Khmer
+  name_km String
+
+  type   String? // CLOTHING, SHOE, etc. (optional for classification)
+  status String  @default("ACTIVE")
+
+  createdAt DateTime @default(now())
+
+  productVariants ProductVariant[]
+
+  @@unique([name_en, name_km])
+  @@index([status])
+}
+
+model Product {
+  id BigInt @id @default(autoincrement())
+
+  // English
+  name_en        String
+  slug_en        String  @unique
+  description_en String? @db.Text
+
+  // Khmer
+  name_km        String
+  slug_km        String  @unique
+  description_km String? @db.Text
+
+  status String @default("DRAFT") // DRAFT, ACTIVE, INACTIVE, ARCHIVED
+
+  brandId    BigInt?
+  categoryId BigInt?
+  branchId   BigInt?
+
+  brand    Brand?    @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  branch   Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  // Relationships
+  images     ProductImage[]
+  variants   ProductVariant[]
+  orderItems OrderItem[]
+
+  createdById BigInt?
+  updatedById BigInt?
+
+  createdBy User? @relation("CreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User? @relation("UpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([branchId])
+  @@index([status])
+}
+
+// Product Images - can have multiple images per product
+model ProductImage {
+  id        BigInt @id @default(autoincrement())
+  productId BigInt
+  url       String
+
+  // English
+  altText_en String?
+
+  // Khmer
+  altText_km String?
+
+  order     Int      @default(0) // to control image display order
+  isPrimary Boolean  @default(false) // main product image
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+}
+
+// Product Variant - combines product with specific color and size
+model ProductVariant {
+  id        BigInt   @id @default(autoincrement())
+  productId BigInt
+  colorId   BigInt?
+  sizeId    BigInt?
+  sku       String   @unique
+  price     Decimal  @db.Decimal(10, 2)
+  cost      Decimal? @db.Decimal(10, 2) // Cost price for profit calculation
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  color   Color?  @relation(fields: [colorId], references: [id], onDelete: SetNull)
+  size    Size?   @relation(fields: [sizeId], references: [id], onDelete: SetNull)
+
+  inventory  Inventory[]
+  orderItems OrderItem[]
+
+  @@unique([productId, colorId, sizeId])
+  @@index([productId])
+  @@index([colorId])
+  @@index([sizeId])
+  @@index([status])
+}
+
+// ========== INVENTORY MANAGEMENT ==========
+
+model Warehouse {
+  id       BigInt  @id @default(autoincrement())
+  branchId BigInt?
+
+  // English
+  name_en    String
+  address_en String?
+
+  // Khmer
+  name_km    String
+  address_km String?
+
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+
+  branch    Branch?     @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  inventory Inventory[]
+
+  @@unique([branchId, name_en])
+  @@unique([branchId, name_km])
+  @@index([branchId])
+  @@index([status])
+}
+
+model Inventory {
+  id           BigInt   @id @default(autoincrement())
+  warehouseId  BigInt
+  variantId    BigInt
+  qtyOnHand    Int      @default(0)
+  qtyReserved  Int      @default(0) // Reserved for pending orders
+  reorderLevel Int      @default(0) // Threshold for low stock alert
+  createdAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  warehouse Warehouse      @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  variant   ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([warehouseId, variantId])
+  @@index([warehouseId])
+  @@index([variantId])
+}
+
+// ========== CUSTOMER MANAGEMENT ==========
+
+model Customer {
+  id        BigInt   @id @default(autoincrement())
+  firstName String
+  lastName  String?
+  email     String?  @unique
+  phone     String?  @unique
+  address   String?
+  city      String?
+  state     String?
+  zipCode   String?
+  country   String?
+  status    String   @default("ACTIVE") // ACTIVE, INACTIVE
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([status])
+}
+
+// ========== ORDER MANAGEMENT ==========
+
+model Order {
+  id BigInt @id @default(autoincrement())
+
+  // English order number
+  orderNumber_en String? @unique
+
+  // Khmer order number
+  orderNumber_km String? @unique
+
+  // Generic order number (always required)
+  orderNumber String @unique
+
+  customerId BigInt?
+  branchId   BigInt?
+
+  orderStatus    String  @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  totalAmount    Decimal @default(0) @db.Decimal(12, 2)
+  shippingAmount Decimal @default(0) @db.Decimal(10, 2)
+  taxAmount      Decimal @default(0) @db.Decimal(10, 2)
+  discountAmount Decimal @default(0) @db.Decimal(10, 2)
+
+  // Localized notes
+  notes_en String? @db.Text // English notes/comments
+  notes_km String? @db.Text // Khmer notes/comments
+
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  branch   Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  items    OrderItem[]
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([branchId])
+  @@index([orderStatus])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id        BigInt  @id @default(autoincrement())
+  orderId   BigInt
+  productId BigInt
+  variantId BigInt?
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2) // Unit price at time of order
+  createdAt DateTime @default(now())
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id], onDelete: Restrict)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
+}
+
+model Payment {
+  id        BigInt   @id @default(autoincrement())
+  orderId   BigInt
+  amount    Decimal  @db.Decimal(12, 2)
+  status    String   @default("PENDING") // PENDING, COMPLETED, FAILED
+  method    String? // CREDIT_CARD, BANK_TRANSFER, CASH, etc.
+  reference String? // Payment gateway reference
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([status])
+}
+
+// ========== CONTENT MANAGEMENT ==========
+
+// Banner - for homepage and promotional display
+model Banner {
+  id       BigInt  @id @default(autoincrement())
+  branchId BigInt?
+
+  // English
+  title_en       String
+  description_en String?
+
+  // Khmer
+  title_km       String
+  description_km String?
+
+  imageUrl  String
+  link      String? // URL to navigate when clicked
+  order     Int       @default(0) // Display order
+  status    String    @default("ACTIVE")
+  startDate DateTime? // When banner should start showing
+  endDate   DateTime? // When banner should stop showing
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@index([branchId])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+}
+
+// Static Pages - for About, Contact, Terms, etc.
+model Page {
+  id       BigInt  @id @default(autoincrement())
+  branchId BigInt?
+
+  // English
+  title_en   String
+  slug_en    String @unique
+  content_en String @db.Text
+
+  // Khmer
+  title_km   String
+  slug_km    String @unique
+  content_km String @db.Text
+
+  status    String   @default("DRAFT") // DRAFT, PUBLISHED
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branch Branch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@index([branchId])
+  @@index([status])
+}
+
+// ========== ANALYTICS & SETTINGS (OPTIONAL) ==========
+
+model Setting {
+  id    BigInt  @id @default(autoincrement())
+  key   String  @unique
+  value String  @db.Text
+  type  String? // STRING, NUMBER, BOOLEAN, JSON
+
+  @@index([key])
+}

@@ -1,0 +1,113 @@
+{
+  "Sidebar": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "orders": "Orders",
+    "customers": "Customers",
+    "banners": "Banners",
+    "title": "Glitter Shop"
+  },
+  "Common": {
+    "language": "Select Language",
+    "notFound": "Page not found",
+    "notFoundTitle": "We can't find that page",
+    "notFoundDesc": "The page may have moved or does not exist.",
+    "back": "Back to Previous Page",
+    "retry": "Retry",
+    "loading": "Loading...",
+    "error": "Failed to load data",
+    "success": "Success"
+  },
+  "dashboard": {
+    "title": "Overview",
+    "products": "Products",
+    "orders": "Orders",
+    "customers": "Customers",
+    "revenue": "Revenue",
+    "subtitle": "Welcome to your e-commerce admin panel",
+    "totalRevenue": "Total Revenue",
+    "totalOrders": "Total Orders",
+    "totalCustomers": "Total Customers",
+    "totalProducts": "Total Products",
+    "fromLastMonth": "from last month",
+    "recentOrders": "Recent Orders",
+    "topProducts": "Top Products",
+    "noProduct": "No Products",
+    "noRecentOrder": "No Recent Orders",
+    "revenueTrend": "Revenue & Orders Trend"
+  },
+  "products": {
+    "title": "Products",
+    "subtitle": "Manage your products and inventory",
+    "newProduct": "New Product",
+    "search": "Search products by name...",
+    "noResults": "No products found",
+    "table": {
+      "product": "Product",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "stock": {
+      "inStock": "In Stock",
+      "lowStock": "Low Stock",
+      "outOfStock": "Out of Stock"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "inactive": "Inactive",
+      "archived": "Archived"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "loading": "Loading products..."
+    },
+    "dialog": {
+      "deleteTitle": "Delete Product",
+      "deleteMessage": "Are you sure you want to delete this product? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting..."
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "products": "products",
+      "page": "Page",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "form": {
+      "name_en": "Product Name (English)",
+      "name_km": "Product Name (Khmer)",
+      "slug_en": "Slug (English)",
+      "slug_km": "Slug (Khmer)",
+      "description_en": "Description (English)",
+      "description_km": "Description (Khmer)",
+      "category": "Category",
+      "brand": "Brand",
+      "status": "Status",
+      "save": "Save Product",
+      "creating": "Creating...",
+      "updating": "Updating...",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "deleteSuccess": "Product deleted successfully",
+      "createSuccess": "Product created successfully",
+      "updateSuccess": "Product updated successfully",
+      "deleteError": "Failed to delete product",
+      "createError": "Failed to create product",
+      "updateError": "Failed to update product",
+      "loadError": "Failed to load products",
+      "retry": "Retry"
+    }
+  }
+}
