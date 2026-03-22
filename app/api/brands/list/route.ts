@@ -1,27 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const brands = await prisma.brand.findMany({
-      where: { status: 'ACTIVE' },
-      select: {
-        id: true,
-        name_en: true,
-        name_km: true,
-      },
-      orderBy: { name_en: 'asc' },
+      where: { status: "ACTIVE" },
+      orderBy: { name_en: "asc" },
     });
 
+    // ✅ Convert BigInt to string
+    const brandsResponse = brands.map((brand) => ({
+      id: brand.id.toString(),
+      name_en: brand.name_en,
+      slug_en: brand.slug_en,
+      name_km: brand.name_km,
+      slug_km: brand.slug_km,
+      logo: brand.logo,
+      status: brand.status,
+      createdAt: brand.createdAt.toISOString()
+    }));
+
     return NextResponse.json({
-      data: brands,
-      total: brands.length,
+      data: brandsResponse,
     });
   } catch (error) {
-    console.error('Failed to fetch brands:', error);
+    console.error("Failed to fetch brands:", error);
     return NextResponse.json(
-      { message: 'Failed to fetch brands' },
-      { status: 500 }
+      { message: "An unexpected error occurred" },
+      { status: 500 },
     );
   }
 }

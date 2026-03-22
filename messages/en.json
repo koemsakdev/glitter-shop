@@ -3,6 +3,7 @@
     "dashboard": "Dashboard",
     "products": "Products",
     "categories": "Categories",
+    "brands": "Brands",
     "orders": "Orders",
     "customers": "Customers",
     "banners": "Banners",
@@ -107,6 +108,142 @@
       "createError": "Failed to create product",
       "updateError": "Failed to update product",
       "loadError": "Failed to load products",
+      "retry": "Retry"
+    }
+  },
+  "brands": {
+    "title": "Brands",
+    "subtitle": "Manage your product brands",
+    "newBrand": "New Brand",
+    "search": "Search brands by name...",
+    "noResults": "No brands found",
+    "table": {
+      "brand": "Brand",
+      "logo": "Logo",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "loading": "Loading brands..."
+    },
+    "dialog": {
+      "deleteTitle": "Delete Brand",
+      "deleteMessage": "Are you sure you want to delete this brand? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting..."
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "brands": "brands",
+      "page": "Page",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "form": {
+      "name_en": "Brand Name (English)",
+      "name_km": "Brand Name (Khmer)",
+      "slug_en": "Slug (English)",
+      "slug_km": "Slug (Khmer)",
+      "logo": "Brand Logo",
+      "status": "Status",
+      "uploadPlaceholder": "Click to upload brand logo",
+      "fileInfo": "PNG, JPG, GIF up to 5MB",
+      "uploadingImage": "Uploading image...",
+      "save": "Save Brand",
+      "creating": "Creating...",
+      "updating": "Updating...",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "deleteSuccess": "Brand deleted successfully",
+      "createSuccess": "Brand created successfully",
+      "updateSuccess": "Brand updated successfully",
+      "deleteError": "Failed to delete brand",
+      "createError": "Failed to create brand",
+      "updateError": "Failed to update brand",
+      "loadError": "Failed to load brands",
+      "uploadSuccess": "Image uploaded successfully",
+      "uploadError": "Failed to upload image",
+      "retry": "Retry"
+    }
+  },
+  "categories": {
+    "title": "Categories",
+    "subtitle": "Manage your product categories",
+    "newCategory": "New Category",
+    "search": "Search categories by name...",
+    "noResults": "No categories found",
+    "table": {
+      "category": "Category",
+      "icon": "Icon",
+      "parentCategory": "Parent Category",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "loading": "Loading categories..."
+    },
+    "dialog": {
+      "deleteTitle": "Delete Category",
+      "deleteMessage": "Are you sure you want to delete this category? This action cannot be undone.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting..."
+    },
+    "pagination": {
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "categories": "categories",
+      "page": "Page",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "form": {
+      "name_en": "Category Name (English)",
+      "name_km": "Category Name (Khmer)",
+      "slug_en": "Slug (English)",
+      "slug_km": "Slug (Khmer)",
+      "icon": "Category Icon/Image",
+      "parentCategory": "Parent Category (Optional)",
+      "status": "Status",
+      "selectParent": "Select parent category",
+      "none": "None",
+      "uploadPlaceholder": "Click to upload category icon",
+      "fileInfo": "PNG, JPG, GIF up to 5MB",
+      "uploadingImage": "Uploading image...",
+      "save": "Save Category",
+      "creating": "Creating...",
+      "updating": "Updating...",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "deleteSuccess": "Category deleted successfully",
+      "createSuccess": "Category created successfully",
+      "updateSuccess": "Category updated successfully",
+      "deleteError": "Failed to delete category",
+      "createError": "Failed to create category",
+      "updateError": "Failed to update category",
+      "loadError": "Failed to load categories",
+      "uploadSuccess": "Image uploaded successfully",
+      "uploadError": "Failed to upload image",
+      "cannotDeleteWithProducts": "Cannot delete category with existing products",
+      "cannotDeleteWithSubcategories": "Cannot delete category with subcategories",
       "retry": "Retry"
     }
   }

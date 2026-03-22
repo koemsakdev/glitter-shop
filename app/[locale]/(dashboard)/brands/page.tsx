@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from 'next-intl';
 import toast from 'react-hot-toast';
-import { getCategories, removeCategory } from '@/features/categories/server/actions';
+import { getBrands, removeBrand } from '@/features/brands/server/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -33,13 +33,13 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Search, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Category, CategoriesResponse } from '@/lib/services/categories.service';
+import { Brand, BrandsResponse } from '@/lib/services/brands.service';
 
-export default function CategoriesPage() {
-  const t = useTranslations('categories');
+export default function BrandsPage() {
+  const t = useTranslations('brands');
   const locale = useLocale();
-
-  const [categories, setCategories] = useState<Category[]>([]);
+  
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,20 +51,20 @@ export default function CategoriesPage() {
 
   const limit = 10;
 
-  const fetchCategories = useCallback(async () => {
+  const fetchBrands = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response: CategoriesResponse = await getCategories(
+      const response: BrandsResponse = await getBrands(
         page,
         limit,
         search || undefined
       );
-      setCategories(response.data);
+      setBrands(response.data);
       setTotal(response.total);
       setPages(response.pages);
     } catch (error) {
-      console.error('Failed to fetch categories:', error);
+      console.error('Failed to fetch brands:', error);
       setError(t('messages.loadError'));
       toast.error(t('messages.loadError'));
     } finally {
@@ -77,18 +77,18 @@ export default function CategoriesPage() {
   }, [search]);
 
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    fetchBrands();
+  }, [fetchBrands]);
 
   const handleDelete = async (id: string) => {
     try {
       setIsDeleting(true);
-      await removeCategory(id);
+      await removeBrand(id);
       toast.success(t('messages.deleteSuccess'));
-      await fetchCategories();
+      await fetchBrands();
       setDeleteId(null);
     } catch (error) {
-      console.error('Failed to delete category:', error);
+      console.error('Failed to delete brand:', error);
       toast.error(t('messages.deleteError'));
     } finally {
       setIsDeleting(false);
@@ -118,10 +118,10 @@ export default function CategoriesPage() {
             {t('subtitle')}
           </p>
         </div>
-        <Link href={`/${locale}/categories/new`}>
+        <Link href={`/${locale}/brands/new`}>
           <Button className="bg-blue-600 hover:bg-blue-700">
             <Plus className="mr-2 h-4 w-4" />
-            {t('newCategory')}
+            {t('newBrand')}
           </Button>
         </Link>
       </div>
@@ -142,7 +142,7 @@ export default function CategoriesPage() {
         <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-4">
           <p className="text-red-800 dark:text-red-200">{error}</p>
           <Button
-            onClick={() => fetchCategories()}
+            onClick={() => fetchBrands()}
             variant="outline"
             size="sm"
             className="mt-2"
@@ -167,55 +167,51 @@ export default function CategoriesPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-gray-50 dark:bg-slate-900">
-                  <TableHead>{t('table.category')}</TableHead>
-                  <TableHead>{t('table.parentCategory')}</TableHead>
+                  <TableHead>{t('table.brand')}</TableHead>
                   <TableHead>{t('table.status')}</TableHead>
                   <TableHead>{t('table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {categories.length === 0 ? (
+                {brands.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={4}
+                      colSpan={3}
                       className="text-center py-8 text-gray-500"
                     >
                       {t('noResults')}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  categories.map((category) => (
+                  brands.map((brand) => (
                     <TableRow
-                      key={category.id}
+                      key={brand.id}
                       className="hover:bg-gray-50 dark:hover:bg-slate-800"
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          {category.image && (
-                            <div className="relative w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded">
+                          {brand.logo && (
+                            <div className="relative w-10 h-10">
                               <Image
-                                src={category.image}
-                                alt={category.name_en}
+                                src={brand.logo}
+                                alt={brand.name_en}
                                 fill
-                                className="object-contain p-1"
+                                className="object-contain"
                               />
                             </div>
                           )}
                           <div>
-                            <p className="font-medium">{category.name_en}</p>
+                            <p className="font-medium">{brand.name_en}</p>
                             <p className="text-sm text-gray-500">
-                              {category.name_km}
+                              {brand.name_km}
                             </p>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm">
-                        {category.parent ? category.parent.name_en : '-'}
-                      </TableCell>
                       <TableCell>
-                        <Badge className={getStatusColor(category.status)}>
-                          {t(`status.${category.status.toLowerCase()}`) ||
-                            category.status}
+                        <Badge className={getStatusColor(brand.status)}>
+                          {t(`status.${brand.status.toLowerCase()}`) ||
+                            brand.status}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -231,13 +227,13 @@ export default function CategoriesPage() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem asChild>
-                              <Link href={`/${locale}/categories/${category.id}/edit`}>
+                              <Link href={`/${locale}/brands/${brand.id}/edit`}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 {t('actions.edit')}
                               </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => setDeleteId(category.id)}
+                              onClick={() => setDeleteId(brand.id)}
                               className="text-red-600"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
@@ -276,12 +272,12 @@ export default function CategoriesPage() {
           </AlertDialog>
 
           {/* Pagination */}
-          {categories.length > 0 && (
+          {brands.length > 0 && (
             <div className="flex items-center justify-between mt-6">
               <p className="text-sm text-gray-600">
                 {t('pagination.showing')} {(page - 1) * limit + 1}{' '}
                 {t('pagination.to')} {Math.min(page * limit, total)}{' '}
-                {t('pagination.of')} {total} {t('pagination.categories')}
+                {t('pagination.of')} {total} {t('pagination.brands')}
               </p>
               <div className="flex gap-2">
                 <Button

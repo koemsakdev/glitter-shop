@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartBarStacked, LayoutDashboard, PackageOpen, ShoppingBasket, TicketSlash, UsersRound, WalletCards } from "lucide-react";
+import { ChartBarStacked, Framer, LayoutDashboard, PackageOpen, ShoppingBasket, TicketSlash, UsersRound, WalletCards } from "lucide-react";
 import { SidebarItem } from "@/app/[locale]/(dashboard)/_components/sidebar-item"
 import { useTranslations } from "next-intl";
 
@@ -23,6 +23,11 @@ export const SidebarRoute = () => {
       name: t("categories"),
       href: "/categories",
       icon: ChartBarStacked
+    },
+    {
+      name: t("brands"),
+      href: "/brands",
+      icon: Framer
     },
     {
       name: t("orders"),

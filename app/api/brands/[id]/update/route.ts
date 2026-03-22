@@ -1,75 +1,72 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-
-interface UpdateBrandBody {
-  name_en?: string;
-  slug_en?: string;
-  name_km?: string;
-  slug_km?: string;
-  logo?: string;
-  status?: string;
-}
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { id } = params;
-    const body: UpdateBrandBody = await request.json();
+    const body = await request.json();
 
-    const existingBrand = await prisma.brand.findUnique({
-      where: { id: BigInt(id) },
-    });
-
-    if (!existingBrand) {
+    // Validate required fields
+    if (!body.name_en || !body.slug_en || !body.name_km || !body.slug_km) {
       return NextResponse.json(
-        { message: 'Brand not found' },
-        { status: 404 }
+        { message: "Missing required fields" },
+        { status: 400 },
       );
     }
 
-    if (body.slug_en || body.slug_km) {
-      const conflictingBrand = await prisma.brand.findFirst({
-        where: {
-          AND: [
-            { id: { not: BigInt(id) } },
-            {
-              OR: [
-                ...(body.slug_en ? [{ slug_en: body.slug_en }] : []),
-                ...(body.slug_km ? [{ slug_km: body.slug_km }] : []),
-              ],
-            },
-          ],
-        },
-      });
-
-      if (conflictingBrand) {
-        return NextResponse.json(
-          { message: 'Brand slug already exists' },
-          { status: 400 }
-        );
-      }
-    }
-
-    const brand = await prisma.brand.update({
-      where: { id: BigInt(id) },
-      data: {
-        ...(body.name_en && { name_en: body.name_en }),
-        ...(body.slug_en && { slug_en: body.slug_en }),
-        ...(body.name_km && { name_km: body.name_km }),
-        ...(body.slug_km && { slug_km: body.slug_km }),
-        ...(body.logo !== undefined && { logo: body.logo || null }),
-        ...(body.status && { status: body.status }),
+    // Check if slug already exists (excluding current brand)
+    const existingBrand = await prisma.brand.findFirst({
+      where: {
+        AND: [
+          { NOT: { id: BigInt(id) } },
+          {
+            OR: [{ slug_en: body.slug_en }, { slug_km: body.slug_km }],
+          },
+        ],
       },
     });
 
-    return NextResponse.json(brand);
+    if (existingBrand) {
+      return NextResponse.json(
+        { message: "Brand with this slug already exists" },
+        { status: 409 },
+      );
+    }
+
+    // Update brand
+    const brand = await prisma.brand.update({
+      where: { id: BigInt(id) },
+      data: {
+        name_en: body.name_en,
+        slug_en: body.slug_en,
+        name_km: body.name_km,
+        slug_km: body.slug_km,
+        logo: body.logo || null,
+        status: body.status || "ACTIVE",
+      },
+    });
+
+    // ✅ Convert BigInt to string
+    const brandResponse = {
+      id: brand.id.toString(),
+      name_en: brand.name_en,
+      slug_en: brand.slug_en,
+      name_km: brand.name_km,
+      slug_km: brand.slug_km,
+      logo: brand.logo,
+      status: brand.status,
+      createdAt: brand.createdAt.toISOString()
+    };
+
+    return NextResponse.json(brandResponse);
   } catch (error) {
-    console.error('Failed to update brand:', error);
+    console.error("Failed to update brand:", error);
     return NextResponse.json(
-      { message: 'Failed to update brand' },
-      { status: 500 }
+      { message: "An unexpected error occurred" },
+      { status: 500 },
     );
   }
 }
