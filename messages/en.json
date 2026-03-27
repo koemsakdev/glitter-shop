@@ -9,6 +9,22 @@
     "banners": "Banners",
     "title": "Glitter Shop"
   },
+  "imageUpload": {
+    "placeholder": "Click to upload or drag and drop",
+    "fileInfo": "PNG, JPG, GIF, WebP (Max 5MB)",
+    "uploading": "Uploading...",
+    "buttons": {
+      "change": "Change Image",
+      "remove": "Remove"
+    },
+    "messages": {
+      "invalidFile": "Only image files are supported (JPG, PNG, GIF, WebP)",
+      "fileTooLarge": "File size must be less than 5MB",
+      "uploadSuccess": "Image uploaded successfully",
+      "uploadError": "Failed to upload image",
+      "removeSuccess": "Image removed"
+    }
+  },
   "Common": {
     "language": "Select Language",
     "notFound": "Page not found",
@@ -180,7 +196,7 @@
     "title": "Categories",
     "subtitle": "Manage your product categories",
     "newCategory": "New Category",
-    "search": "Search categories by name...",
+    "search": "Search categories...",
     "noResults": "No categories found",
     "table": {
       "category": "Category",
@@ -215,6 +231,8 @@
       "next": "Next"
     },
     "form": {
+      "title": "Category Information",
+      "description": "Provide the basic information and visual assets for this category.",
       "name_en": "Category Name (English)",
       "name_km": "Category Name (Khmer)",
       "slug_en": "Slug (English)",
@@ -228,6 +246,8 @@
       "fileInfo": "PNG, JPG, GIF up to 5MB",
       "uploadingImage": "Uploading image...",
       "save": "Save Category",
+      "create": "Create Category",
+      "modify": "Modify Category",
       "creating": "Creating...",
       "updating": "Updating...",
       "cancel": "Cancel"
